@@ -29,23 +29,23 @@ export async function POST(req: Request) {
   const ip = await getClientIp();
   // Light flood protection: 20 messages / minute per IP.
   const rl = rateLimit(`chat:${ip ?? "unknown"}`, { limit: 20, windowMs: 60_000 });
-  if (!rl.ok) return NextResponse.json({ error: "Слишком быстро" }, { status: 429 });
+  if (!rl.ok) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   let json: unknown;
   try {
     json = await req.json();
   } catch {
-    return NextResponse.json({ error: "Некорректный запрос" }, { status: 400 });
+    return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
   const parsed = schema.safeParse(json);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Введите сообщение" }, { status: 400 });
+    return NextResponse.json({ error: "Message required" }, { status: 400 });
   }
 
   const body = sanitizeChatBody(parsed.data.body ?? "").slice(0, MAX_BODY);
   const attachments = parseAttachments(parsed.data.attachments ?? []);
   if (!body && attachments.length === 0) {
-    return NextResponse.json({ error: "Введите сообщение" }, { status: 400 });
+    return NextResponse.json({ error: "Message required" }, { status: 400 });
   }
 
   const visitor = await resolveVisitor({

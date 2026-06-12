@@ -1,6 +1,6 @@
 {
   "name": "tglive",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Telegram-grade live chat for Next.js — visitor widget + admin console, realtime over SSE, attachments, reactions, and best-in-class mobile-keyboard behavior.",
   "keywords": [
     "nextjs",
@@ -48,7 +48,8 @@
     "./routes/*": "./src/app/api/*/route.ts",
     "./styles.css": "./globals.chat.css",
     "./tailwind": "./tailwind-preset.cjs",
-    "./prisma": "./prisma/chat.prisma"
+    "./prisma": "./prisma/chat.prisma",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

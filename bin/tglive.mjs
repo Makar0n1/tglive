@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Telegrade scaffolder. Generates the thin Next.js route files that re-export the
+// tglive scaffolder. Generates the thin Next.js route files that re-export the
 // package's handlers, so the chat's server logic auto-updates with `npm update`
 // while these one-line files stay put.
 //

@@ -14,7 +14,7 @@ npx tglive init
 
 ## Features
 
-- 💬 Realtime messaging over **Server-Sent Events** (no webssocket infra, no SaaS)
+- 💬 Realtime messaging over **Server-Sent Events** (no websocket infra, no SaaS)
 - 📷 Photo & file attachments — staged like Telegram, progress, cancel, lightbox
 - 😀 Reactions, replies (swipe / double-tap), delete with a particle "dissolve"
 - ✓✓ Read receipts, typing indicators, unread badges
@@ -26,9 +26,12 @@ npx tglive init
 
 ## Requirements
 
-- **Next.js 15** (App Router), **React 19**, **TypeScript**
+- **Next.js 15** (App Router), **React 19**, **TypeScript** — built & tested on
+  Next 15; Next 16 is not yet verified (pin Next 15 if you hit issues)
 - **PostgreSQL** + **Prisma**
-- **Tailwind CSS**
+- **Tailwind CSS v3** — the preset uses the v3 JS-config format (`presets`,
+  `require`). On Tailwind **v4** (the new `create-next-app` default) presets don't
+  apply — see the v4 note in step 2.
 - A long-running Node server for SSE (VPS / Docker / Render / Fly — not edge
   functions that cap connection time)
 
@@ -46,17 +49,30 @@ npx prisma migrate dev --name tglive
 npx prisma generate
 ```
 
-### 2. Tailwind
+### 2. Tailwind (v3)
 
 ```js
 // tailwind.config.js
 module.exports = {
-  presets: [require("tglive/tailwind")], // colors + animations + the package's content glob
-  content: ["./src/**/*.{ts,tsx}"],          // your own content
+  presets: [require("tglive/tailwind")], // colors + animations
+  content: [
+    "./src/**/*.{ts,tsx}",
+    "./node_modules/tglive/src/**/*.{ts,tsx}", // REQUIRED — scan the chat's classes
+  ],
 };
 ```
 
+> **Add the `node_modules/tglive` glob to YOUR `content` yourself.** Tailwind does
+> not reliably merge a preset's `content` array, so relying on the preset alone
+> leaves the chat unstyled (missing `bg-bg-card`, `animate-fade-in`, …).
+
 Rebrand by overriding the `bg-*/fg-*/accent` colors in your own config.
+
+> **Tailwind v4?** v4 drops JS presets. Instead: add the package glob to your
+> `content`/source, and port the color tokens + keyframes + animations from
+> `node_modules/tglive/tailwind-preset.cjs` into your CSS `@theme` (same class
+> names: `bg-bg-soft`, `text-fg`, `animate-bubble`, …). A v4-native preset is on
+> the roadmap.
 
 ### 3. Styles
 

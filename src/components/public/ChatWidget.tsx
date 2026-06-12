@@ -97,14 +97,6 @@ export function ChatWidget() {
   // Keyboard up? When it is, the browser's bottom chrome is gone (the keyboard
   // replaces it), so the big bottom inset must collapse to a small one.
   const [kbUp, setKbUp] = useState(false);
-  // Bottom inset for the composer depends on the browser's bottom chrome, which
-  // overlaps the content differently: Chrome iOS has a tall bottom nav bar,
-  // Safari a shorter URL bar, everything else (Firefox, Android) reports the
-  // visible height correctly and needs almost nothing.
-  const [bottomPad, setBottomPad] = useState("pb-3");
-  // Bottom inset while the keyboard is UP (browser chrome is gone, but Safari
-  // still tucks a small URL pill above the keyboard, so it needs a bit more).
-  const [kbUpPad, setKbUpPad] = useState("pb-3");
   // Firefox renders the chat fine without the sticky header — skip it there.
   const [isFirefox, setIsFirefox] = useState(false);
   const stickyHeaderRef = useRef<HTMLDivElement>(null);
@@ -259,14 +251,7 @@ export function ChatWidget() {
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 639);
     check();
-    const ua = navigator.userAgent;
-    const crios = /crios/i.test(ua);
-    const firefox = /fxios|firefox/i.test(ua);
-    const safari = /^((?!chrome|android|crios|fxios|edg).)*safari/i.test(ua);
-    setBottomPad(crios ? "pb-32" : safari ? "pb-12" : "pb-3");
-    // Keyboard-up inset: Safari needs a chunk (URL pill), Chrome iOS a moderate
-    // lift to clear the keyboard, everyone else almost nothing.
-    setKbUpPad(safari ? "pb-12" : crios ? "pb-[7.5rem]" : "pb-3");
+    const firefox = /fxios|firefox/i.test(navigator.userAgent);
     setIsFirefox(firefox);
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -945,7 +930,14 @@ export function ChatWidget() {
           ) : null}
           </div>
 
-          <div className={cn("border-t border-bg-border px-2.5 pt-2 sm:pb-3", kbUp ? kbUpPad : bottomPad)}>
+          {/* Device-agnostic bottom inset: clears the home-indicator / safe area on
+              notched phones, collapses to a small pad elsewhere (and when the
+              keyboard is up, where the safe area reads 0). Replaces the old
+              per-browser hardcoded paddings that only fit one specific device. */}
+          <div
+            className="border-t border-bg-border px-2.5 pt-2"
+            style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+          >
             {mediaError ? (
               <p className="mb-2 rounded-md bg-red-500/15 px-2 py-1 text-xs text-red-300">{mediaError}</p>
             ) : null}

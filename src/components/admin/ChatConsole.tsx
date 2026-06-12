@@ -52,7 +52,7 @@ export function ChatConsole() {
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const stickyHeaderRef = useRef<HTMLDivElement>(null);
   // New app-shell keyboard handling (same as the guest chat; see CLAUDE.md §6.5e).
-  const { isMobile, bottomPad, kbUpPad, kbUp, stickyShow, isFirefox } = useChatAppShell(
+  const { isMobile, kbUp, stickyShow, isFirefox } = useChatAppShell(
     activeId !== null,
     paneRef,
     stickyHeaderRef,
@@ -530,12 +530,11 @@ export function ChatConsole() {
             ) : null}
             </div>
 
-            {/* Composer */}
+            {/* Composer. Device-agnostic bottom inset via env(safe-area-inset-bottom)
+                — clears the home indicator on notched phones, ~0 elsewhere. */}
             <div
-              className={cn(
-                "border-t border-bg-border px-2.5 pt-2 lg:pb-3",
-                kbUp ? kbUpPad : bottomPad
-              )}
+              className="border-t border-bg-border px-2.5 pt-2"
+              style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
             >
               {mediaError ? (
                 <p className="mb-2 rounded-md bg-red-500/15 px-2 py-1 text-xs text-red-300">{mediaError}</p>

@@ -23,15 +23,15 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const parsed = schema.safeParse(await req.json().catch(() => null));
-  if (!parsed.success) return NextResponse.json({ error: "Введите сообщение" }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ error: "Message required" }, { status: 400 });
 
   const body = sanitizeChatBody(parsed.data.body ?? "").slice(0, MAX_BODY);
   const attachments = parseAttachments(parsed.data.attachments ?? []);
   if (!body && attachments.length === 0) {
-    return NextResponse.json({ error: "Введите сообщение" }, { status: 400 });
+    return NextResponse.json({ error: "Message required" }, { status: 400 });
   }
 
   const message = await postAdminMessage(parsed.data.threadId, body, parsed.data.replyTo, attachments);

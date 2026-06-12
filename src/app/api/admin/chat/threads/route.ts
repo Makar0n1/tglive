@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 // Thread list for the admin chat console (most recent first).
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const threads = await prisma.chatThread.findMany({
     orderBy: { lastMessageAt: "desc" },

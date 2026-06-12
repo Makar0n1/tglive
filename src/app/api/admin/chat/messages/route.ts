@@ -5,11 +5,10 @@ import { parseAttachments } from "../../../../../lib/chat";
 
 export const dynamic = "force-dynamic";
 
-// Full conversation + the linked person's identity and their leads, so the
-// admin sees that a chat and a form submission are the same human.
+// Full conversation + the linked visitor's identity for the admin console.
 export async function GET(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const threadId = new URL(req.url).searchParams.get("threadId");
   if (!threadId) return NextResponse.json({ error: "threadId required" }, { status: 400 });

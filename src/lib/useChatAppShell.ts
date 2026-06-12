@@ -22,28 +22,16 @@ export function useChatAppShell(
   pageHideId?: string
 ) {
   const [isMobile, setIsMobile] = useState(false);
-  const [bottomPad, setBottomPad] = useState("pb-3");
-  const [kbUpPad, setKbUpPad] = useState("pb-3");
   const [isFirefox, setIsFirefox] = useState(false);
   const [kbUp, setKbUp] = useState(false);
   const [stickyShow, setStickyShow] = useState(false);
 
-  // Mobile breakpoint + per-browser inset classes.
+  // Mobile breakpoint + Firefox detection (the composer bottom inset is now
+  // device-agnostic via env(safe-area-inset-bottom) in ChatConsole, not per-UA).
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= maxWidth);
     check();
-    const ua = navigator.userAgent;
-    const crios = /crios/i.test(ua);
-    const firefox = /fxios|firefox/i.test(ua);
-    const safari = /^((?!chrome|android|crios|fxios|edg).)*safari/i.test(ua);
-    const standalone =
-      (typeof window.matchMedia === "function" &&
-        window.matchMedia("(display-mode: standalone)").matches) ||
-      (window.navigator as { standalone?: boolean }).standalone === true;
-    setBottomPad(crios ? "pb-[120px]" : safari ? "pb-[46px]" : "pb-3");
-    // Installed PWA has no browser chrome above the keyboard -> much smaller inset.
-    setKbUpPad(standalone ? "pb-[20px]" : safari ? "pb-[62px]" : crios ? "pb-[118px]" : "pb-3");
-    setIsFirefox(firefox);
+    setIsFirefox(/fxios|firefox/i.test(navigator.userAgent));
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, [maxWidth]);
@@ -218,5 +206,5 @@ export function useChatAppShell(
     };
   }, [active, isMobile, paneRef]);
 
-  return { isMobile, bottomPad, kbUpPad, kbUp, stickyShow, isFirefox };
+  return { isMobile, kbUp, stickyShow, isFirefox };
 }

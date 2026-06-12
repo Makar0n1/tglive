@@ -9,7 +9,7 @@ const schema = z.object({ threadId: z.string().min(1) });
 // Transient "admin is typing" signal toward the visitor.
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: true });
 

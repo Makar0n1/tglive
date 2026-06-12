@@ -9,16 +9,16 @@ import { rateLimit, sweep } from "../../../../lib/ratelimit";
 export async function POST(req: Request) {
   sweep();
   const cookieId = await getVisitorCookieId();
-  if (!cookieId) return NextResponse.json({ error: "Нет сессии" }, { status: 401 });
+  if (!cookieId) return NextResponse.json({ error: "No session" }, { status: 401 });
 
   const ip = await getClientIp();
   const rl = rateLimit(`chat-upload:${ip ?? "unknown"}`, { limit: 40, windowMs: 60_000 });
-  if (!rl.ok) return NextResponse.json({ error: "Слишком быстро" }, { status: 429 });
+  if (!rl.ok) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const form = await req.formData();
   const file = form.get("file");
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "Файл не передан" }, { status: 400 });
+    return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
   const res = await processChatUpload(file);
