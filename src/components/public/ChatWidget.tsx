@@ -380,6 +380,44 @@ export function ChatWidget() {
       if (t && t.closest(".chat-scroll, [data-chat-lightbox]")) return;
       if (e.cancelable) e.preventDefault();
     };
+    // Safari in a browser TAB (not an installed PWA) barely fires visualViewport
+    // events during the keyboard animation, yet it DOES update offsetTop smoothly.
+    // Event-driven tracking therefore only catches the FINAL value -> the panel
+    // jumps up and snaps back. Fix: while an input is focused, poll every frame so
+    // html.top follows offsetTop continuously. Chrome/Firefox fire events fine and
+    // keep their (working) event path — the poll never starts for them.
+    const safariTab =
+      /^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent) &&
+      !(
+        (typeof window.matchMedia === "function" &&
+          window.matchMedia("(display-mode: standalone)").matches) ||
+        (window.navigator as { standalone?: boolean }).standalone === true
+      );
+    let pollRaf = 0;
+    let pollStop: ReturnType<typeof setTimeout> | undefined;
+    const poll = () => {
+      setH();
+      pollRaf = requestAnimationFrame(poll);
+    };
+    const onFocusIn = () => {
+      captureDist();
+      if (safariTab) {
+        clearTimeout(pollStop);
+        if (!pollRaf) pollRaf = requestAnimationFrame(poll);
+      }
+    };
+    const onFocusOut = () => {
+      captureDist();
+      if (safariTab) {
+        // Keep polling through the close animation, then stop.
+        clearTimeout(pollStop);
+        pollStop = setTimeout(() => {
+          if (pollRaf) cancelAnimationFrame(pollRaf);
+          pollRaf = 0;
+        }, 700);
+      }
+    };
+
     setH();
     captureDist();
     vv?.addEventListener("resize", onVV);
@@ -387,10 +425,9 @@ export function ChatWidget() {
     window.addEventListener("resize", onVV);
     document.addEventListener("touchmove", onTouchMove, { passive: false });
     // focusin/focusout = the reliable keyboard open/close triggers: snapshot the
-    // line above the input right before the viewport starts moving. The scroll
-    // listener keeps that snapshot current while the user reads.
-    document.addEventListener("focusin", captureDist);
-    document.addEventListener("focusout", captureDist);
+    // line above the input + (Safari tab) start/stop the per-frame poll.
+    document.addEventListener("focusin", onFocusIn);
+    document.addEventListener("focusout", onFocusOut);
     scrollRef.current?.addEventListener("scroll", onListScroll, { passive: true });
     const listEl = scrollRef.current;
     return () => {
@@ -399,9 +436,11 @@ export function ChatWidget() {
       vv?.removeEventListener("scroll", onVV);
       window.removeEventListener("resize", onVV);
       document.removeEventListener("touchmove", onTouchMove);
-      document.removeEventListener("focusin", captureDist);
-      document.removeEventListener("focusout", captureDist);
+      document.removeEventListener("focusin", onFocusIn);
+      document.removeEventListener("focusout", onFocusOut);
       listEl?.removeEventListener("scroll", onListScroll);
+      clearTimeout(pollStop);
+      if (pollRaf) cancelAnimationFrame(pollRaf);
       const restore = (el: HTMLElement, p: ReturnType<typeof save>) => {
         el.style.position = p.position;
         el.style.top = p.top;
