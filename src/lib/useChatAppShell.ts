@@ -97,16 +97,16 @@ export function useChatAppShell(
       // extra (pane top/height tracking) made Safari fly the composer.
       html.style.height = h;
       body.style.height = h;
+      // ALIGN the locked document with the visible viewport (Safari tab pushes it
+      // down via offsetTop while leaving the page at layout-top → chat flies up).
+      // Moving html down by offsetTop restores the whole panel. No-op when ~0.
+      html.style.top = offTop;
       if (stickyHeaderRef.current) {
         stickyHeaderRef.current.style.top = offTop;
       }
-      // SHRINK the message list from the TOP by offsetTop. On Safari/Chrome/PWA
-      // (not Firefox) the keyboard pushes the visible viewport DOWN while the
-      // locked pane stays pinned to layout-top, so the list's top band is off
-      // screen and the first messages are unreachable. The list is flex-1, so a
-      // top margin drops it into view AND shrinks its height (composer untouched).
       if (list) {
-        list.style.marginTop = offTopPx ? `${offTopPx}px` : "";
+        // html.top already aligns the whole panel — no per-list margin needed.
+        list.style.marginTop = "";
         if (!stable) {
           // Keep the line above the input fixed: same distance from the bottom.
           list.scrollTop = list.scrollHeight - list.clientHeight - distFromBottom;

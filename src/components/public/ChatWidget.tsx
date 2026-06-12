@@ -327,19 +327,21 @@ export function ChatWidget() {
 
       html.style.height = h;
       body.style.height = h;
+      // ALIGN the locked document with the visible viewport. Some browsers (notably
+      // Safari in a tab) push the visible area DOWN on input focus and report it via
+      // visualViewport.offsetTop (> 0) while leaving the page pinned to layout-top —
+      // so a position:fixed html at top:0 ends up ABOVE the visible area and the
+      // whole chat "flies up under the header". Moving html down by offsetTop puts
+      // the entire panel (header + list + composer) back inside the visible area.
+      // No-op where offsetTop stays ~0 (installed PWA, Chrome/Firefox, desktop).
+      html.style.top = `${offTop}px`;
       // Pin the sticky header to the top of the visible viewport.
       if (stickyHeaderRef.current) {
         stickyHeaderRef.current.style.top = `${offTop}px`;
       }
-      // SHRINK the message list from the TOP by offsetTop. On Safari/Chrome/PWA
-      // (not Firefox) the keyboard pushes the visible viewport DOWN (offsetTop > 0)
-      // while our locked panel stays pinned to layout-top — so the list's top band
-      // sits ABOVE the visible area and its first messages are unreachable (you
-      // scroll to scrollTop:0 but the top is off-screen). The list is flex-1, so a
-      // top margin both drops it into view AND shrinks its height (the composer at
-      // the bottom is untouched) — exactly "narrow the dialog window from the top".
       if (el) {
-        el.style.marginTop = offTop ? `${offTop}px` : "";
+        // html.top already aligns the whole panel — no per-list margin needed.
+        el.style.marginTop = "";
         if (!stable) {
           // Keep the line above the input fixed: same distance from the bottom.
           el.scrollTop = el.scrollHeight - el.clientHeight - distFromBottom;
