@@ -1,0 +1,73 @@
+// ───────────────────────────────────────────────────────────────────────────
+// LiveChat models — APPEND these to your existing prisma/schema.prisma, then run
+//   npx prisma migrate dev --name livechat
+//
+// Requires a PostgreSQL datasource (uses Json columns). The chat references ONLY
+// these three models + the enum — no coupling to the rest of your schema.
+// ───────────────────────────────────────────────────────────────────────────
+
+enum ChatSender {
+  VISITOR
+  ADMIN
+}
+
+// A single "person". One per browser (cookie `pf_visitor`), optionally merged by
+// a normalized contact so the same human is recognized across devices.
+model Visitor {
+  id         String   @id @default(cuid())
+  // Opaque id stored in the visitor's httpOnly cookie.
+  cookieId   String   @unique
+  name       String?
+  contact    String?
+  // Normalized contact (lowercased, digits-only for phones) used to merge the
+  // same person across devices/forms.
+  contactKey String?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  thread ChatThread?
+  // Want to link a visitor to your own models (e.g. leads/orders)? Add the
+  // relation here — the chat doesn't need it.
+
+  @@index([contactKey])
+}
+
+model ChatThread {
+  id            String    @id @default(cuid())
+  visitorId     String    @unique
+  visitor       Visitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  // Unread counters maintained on write for cheap badges.
+  adminUnread   Int       @default(0)
+  visitorUnread Int       @default(0)
+  // "Last read" timestamps drive read receipts (a message is read if the other
+  // side's read time is at/after the message's createdAt) — no per-message writes.
+  adminReadAt   DateTime?
+  visitorReadAt DateTime?
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+
+  messages ChatMessage[]
+
+  @@index([lastMessageAt])
+}
+
+model ChatMessage {
+  id          String      @id @default(cuid())
+  threadId    String
+  thread      ChatThread  @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender      ChatSender
+  body        String
+  // Photo/file attachments: [{ type, url, name, size, mime, width?, height? }].
+  attachments Json        @default("[]")
+  // Telegram-style reactions: [{ emoji, by }]. At most one reaction per side.
+  reactions   Json        @default("[]")
+  // Reply target (self-relation). Null = not a reply.
+  replyToId   String?
+  replyTo     ChatMessage?  @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies     ChatMessage[] @relation("MessageReply")
+  createdAt   DateTime    @default(now())
+
+  @@index([threadId, createdAt])
+}
