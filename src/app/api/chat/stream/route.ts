@@ -1,7 +1,7 @@
-import { getVisitorCookieId } from "@/lib/visitor";
-import { prisma } from "@/lib/prisma";
-import { subscribeVisitor } from "@/lib/chat-bus";
-import { createSSEStream } from "@/lib/sse";
+import { getVisitorCookieId } from "../../../../lib/visitor";
+import { prisma } from "../../../../lib/prisma";
+import { subscribeVisitor } from "../../../../lib/chat-bus";
+import { createSSEStream } from "../../../../lib/sse";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

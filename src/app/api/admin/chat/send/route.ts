@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentUser } from "@/lib/auth";
-import { postAdminMessage, parseAttachments, MAX_BODY, MAX_ATTACHMENTS } from "@/lib/chat";
-import { sanitizeChatBody } from "@/lib/chat-text";
+import { getCurrentUser } from "../../../../../server/config";
+import { postAdminMessage, parseAttachments, MAX_BODY, MAX_ATTACHMENTS } from "../../../../../lib/chat";
+import { sanitizeChatBody } from "../../../../../lib/chat-text";
 
 const attachmentSchema = z.object({
   type: z.enum(["image", "file"]),

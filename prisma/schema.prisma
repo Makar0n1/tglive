@@ -1,0 +1,65 @@
+// DEV-ONLY schema — used to generate a Prisma client so the package typechecks in
+// isolation. NOT published (see package.json "files"); consumers instead append
+// prisma/chat.prisma to their own schema. `prisma generate` needs no live DB.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum ChatSender {
+  VISITOR
+  ADMIN
+}
+
+model Visitor {
+  id         String   @id @default(cuid())
+  cookieId   String   @unique
+  name       String?
+  contact    String?
+  contactKey String?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  thread ChatThread?
+
+  @@index([contactKey])
+}
+
+model ChatThread {
+  id            String    @id @default(cuid())
+  visitorId     String    @unique
+  visitor       Visitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  adminUnread   Int       @default(0)
+  visitorUnread Int       @default(0)
+  adminReadAt   DateTime?
+  visitorReadAt DateTime?
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+
+  messages ChatMessage[]
+
+  @@index([lastMessageAt])
+}
+
+model ChatMessage {
+  id          String        @id @default(cuid())
+  threadId    String
+  thread      ChatThread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender      ChatSender
+  body        String
+  attachments Json          @default("[]")
+  reactions   Json          @default("[]")
+  replyToId   String?
+  replyTo     ChatMessage?  @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies     ChatMessage[] @relation("MessageReply")
+  createdAt   DateTime      @default(now())
+
+  @@index([threadId, createdAt])
+}

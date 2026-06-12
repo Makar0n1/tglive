@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { notifyAdminTyping } from "@/lib/chat";
+import { getCurrentUser } from "../../../../../server/config";
+import { prisma } from "../../../../../lib/prisma";
+import { notifyAdminTyping } from "../../../../../lib/chat";
 
 const schema = z.object({ threadId: z.string().min(1) });
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { processChatUpload } from "@/lib/chat-upload";
+import { getCurrentUser } from "../../../../../server/config";
+import { processChatUpload } from "../../../../../lib/chat-upload";
 
 // Admin chat attachment upload. One file per request.
 export async function POST(req: Request) {

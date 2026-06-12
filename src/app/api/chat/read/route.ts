@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getVisitorCookieId } from "@/lib/visitor";
-import { prisma } from "@/lib/prisma";
-import { markVisitorRead } from "@/lib/chat";
+import { getVisitorCookieId } from "../../../../lib/visitor";
+import { prisma } from "../../../../lib/prisma";
+import { markVisitorRead } from "../../../../lib/chat";
 
 export async function POST() {
   const cookieId = await getVisitorCookieId();

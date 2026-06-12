@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import type { Reaction } from "@/lib/chat-bus";
+import { cn } from "../../lib/utils";
+import type { Reaction } from "../../lib/chat-bus";
 
 // Minimal Telegram-style reaction set.
 export const REACTION_EMOJIS = ["👍", "❤️", "🔥", "😂", "😮", "🙏"];

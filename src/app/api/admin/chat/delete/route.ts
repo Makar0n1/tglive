@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentUser } from "@/lib/auth";
-import { deleteMessage } from "@/lib/chat";
+import { getCurrentUser } from "../../../../../server/config";
+import { deleteMessage } from "../../../../../lib/chat";
 
 const schema = z.object({ messageId: z.string().min(1) });
 

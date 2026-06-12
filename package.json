@@ -1,0 +1,71 @@
+{
+  "name": "telegrade",
+  "version": "0.1.0",
+  "description": "Telegram-grade live chat for Next.js — visitor widget + admin console, realtime over SSE, attachments, reactions, and best-in-class mobile-keyboard behavior.",
+  "keywords": [
+    "nextjs",
+    "react",
+    "live-chat",
+    "chat",
+    "support",
+    "messenger",
+    "sse",
+    "realtime",
+    "prisma",
+    "telegram"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "bin": {
+    "telegrade": "./bin/telegrade.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "prisma/chat.prisma",
+    "globals.chat.css",
+    "tailwind-preset.cjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./admin": "./src/admin.ts",
+    "./server": "./src/server/config.ts",
+    "./routes/uploads": "./src/app/uploads/[...path]/route.ts",
+    "./routes/*": "./src/app/api/*/route.ts",
+    "./styles.css": "./globals.chat.css",
+    "./tailwind": "./tailwind-preset.cjs",
+    "./prisma": "./prisma/chat.prisma"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@prisma/client": ">=5",
+    "next": ">=15",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.460.0",
+    "server-only": "^0.0.1",
+    "sharp": "^0.33.5",
+    "tailwind-merge": "^2.5.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@prisma/client": "^5.22.0",
+    "@types/node": "^22.9.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "next": "^15.0.0",
+    "prisma": "^5.22.0",
+    "react": "^19.0.0",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getVisitorCookieId } from "@/lib/visitor";
-import { prisma } from "@/lib/prisma";
-import { getVisitorState } from "@/lib/chat";
+import { getVisitorCookieId } from "../../../../lib/visitor";
+import { prisma } from "../../../../lib/prisma";
+import { getVisitorState } from "../../../../lib/chat";
 
 export const dynamic = "force-dynamic";
 

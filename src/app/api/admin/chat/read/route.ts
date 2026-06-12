@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentUser } from "@/lib/auth";
-import { markAdminRead } from "@/lib/chat";
+import { getCurrentUser } from "../../../../../server/config";
+import { markAdminRead } from "../../../../../lib/chat";
 
 const schema = z.object({ threadId: z.string().min(1) });
 

@@ -1,6 +1,6 @@
-import { getCurrentUser } from "@/lib/auth";
-import { subscribeAdmin } from "@/lib/chat-bus";
-import { createSSEStream } from "@/lib/sse";
+import { getCurrentUser } from "../../../../../server/config";
+import { subscribeAdmin } from "../../../../../lib/chat-bus";
+import { createSSEStream } from "../../../../../lib/sse";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

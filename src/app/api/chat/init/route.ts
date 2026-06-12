@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { resolveVisitor } from "@/lib/visitor";
-import { getVisitorState } from "@/lib/chat";
-import { getClientIp, getUserAgent } from "@/lib/request";
+import { resolveVisitor } from "../../../../lib/visitor";
+import { getVisitorState } from "../../../../lib/chat";
+import { getClientIp, getUserAgent } from "../../../../lib/request";
 
 export const dynamic = "force-dynamic";
 

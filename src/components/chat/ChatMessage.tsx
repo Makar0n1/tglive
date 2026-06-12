@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { cn, formatTimeMsk } from "@/lib/utils";
+import { cn, formatTimeMsk } from "../../lib/utils";
 import { BubbleMeta } from "./BubbleMeta";
 import { ReadTicks as Ticks } from "./ReadTicks";
 import { Dissolve } from "./Dissolve";
 import { Attachments } from "./Attachments";
-import type { Reaction, Attachment } from "@/lib/chat-bus";
-import type { UploadItem } from "@/lib/chat-media";
+import type { Reaction, Attachment } from "../../lib/chat-bus";
+import type { UploadItem } from "../../lib/chat-media";
 
 export interface ChatMsg {
   id: string;

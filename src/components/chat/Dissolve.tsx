@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, type ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 // Wraps a bubble and plays a Telegram-like dissolve: the bubble fades + blurs
 // while a cloud of small particles scatters outward.

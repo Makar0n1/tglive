@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { ChatEvent } from "@/lib/chat-bus";
+import type { ChatEvent } from "../../lib/chat-bus";
 
 export interface ThreadItem {
   id: string;
@@ -20,7 +20,6 @@ export interface ThreadItem {
   lastSender: "VISITOR" | "ADMIN" | null;
   visitorName: string | null;
   visitorContact: string | null;
-  leadsCount: number;
 }
 
 interface Ctx {

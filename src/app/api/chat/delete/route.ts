@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getVisitorCookieId } from "@/lib/visitor";
-import { prisma } from "@/lib/prisma";
-import { deleteMessage } from "@/lib/chat";
+import { getVisitorCookieId } from "../../../../lib/visitor";
+import { prisma } from "../../../../lib/prisma";
+import { deleteMessage } from "../../../../lib/chat";
 
 const schema = z.object({ messageId: z.string().min(1) });
 

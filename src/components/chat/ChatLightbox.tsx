@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { X, ChevronLeft, ChevronRight, Download } from "lucide-react";
-import type { Attachment } from "@/lib/chat-bus";
+import type { Attachment } from "../../lib/chat-bus";
 
 // Fullscreen image viewer for chat photos. Arrows / swipe to navigate.
 export function ChatLightbox({

@@ -1,20 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
-import { AutoTextarea } from "@/components/chat/AutoTextarea";
-import { EmojiHover } from "@/components/chat/EmojiHover";
-import { ReplyBar } from "@/components/chat/ReplyBar";
-import { ChatMessage, type ChatMsg } from "@/components/chat/ChatMessage";
-import { MessageOverlay } from "@/components/chat/MessageOverlay";
-import { AttachButton } from "@/components/chat/AttachButton";
-import { ChatLightbox } from "@/components/chat/ChatLightbox";
-import { StagedStrip, type StagedFile } from "@/components/chat/StagedStrip";
-import { applyReactionToggle } from "@/components/chat/reactions";
-import { sanitizeChatBody } from "@/lib/chat-text";
-import { useChatAttachmentSend } from "@/lib/useChatAttachmentSend";
-import { validateFile } from "@/lib/chat-media";
-import type { Reaction, Attachment } from "@/lib/chat-bus";
+import { cn } from "../../lib/utils";
+import { AutoTextarea } from "../chat/AutoTextarea";
+import { EmojiHover } from "../chat/EmojiHover";
+import { ReplyBar } from "../chat/ReplyBar";
+import { ChatMessage, type ChatMsg } from "../chat/ChatMessage";
+import { MessageOverlay } from "../chat/MessageOverlay";
+import { AttachButton } from "../chat/AttachButton";
+import { ChatLightbox } from "../chat/ChatLightbox";
+import { StagedStrip, type StagedFile } from "../chat/StagedStrip";
+import { applyReactionToggle } from "../chat/reactions";
+import { sanitizeChatBody } from "../../lib/chat-text";
+import { useChatAttachmentSend } from "../../lib/useChatAttachmentSend";
+import { validateFile } from "../../lib/chat-media";
+import type { Reaction, Attachment } from "../../lib/chat-bus";
 import { MessageCircle, X, Bell, BellOff, Send, ChevronDown } from "lucide-react";
 
 type Msg = ChatMsg;

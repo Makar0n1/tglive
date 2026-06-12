@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type RefObject } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 // Auto-growing message input:
 // - grows with content up to `maxRows`, then scrolls (grows upward because the

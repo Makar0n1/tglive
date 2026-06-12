@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Smile } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import { COMPOSER_EMOJIS } from "./EmojiPicker";
 
 // Desktop-only emoji control that lives inside the input's right edge. Opens on

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { resolveVisitor } from "@/lib/visitor";
-import { postVisitorMessage, parseAttachments, MAX_BODY, MAX_ATTACHMENTS } from "@/lib/chat";
-import { sanitizeChatBody } from "@/lib/chat-text";
-import { getClientIp, getUserAgent } from "@/lib/request";
-import { rateLimit, sweep } from "@/lib/ratelimit";
+import { resolveVisitor } from "../../../../lib/visitor";
+import { postVisitorMessage, parseAttachments, MAX_BODY, MAX_ATTACHMENTS } from "../../../../lib/chat";
+import { sanitizeChatBody } from "../../../../lib/chat-text";
+import { getClientIp, getUserAgent } from "../../../../lib/request";
+import { rateLimit, sweep } from "../../../../lib/ratelimit";
 
 const attachmentSchema = z.object({
   type: z.enum(["image", "file"]),

@@ -3,7 +3,7 @@
 import { useCallback, useRef } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Attachment } from "./chat-bus";
-import type { ChatMsg } from "@/components/chat/ChatMessage";
+import type { ChatMsg } from "../components/chat/ChatMessage";
 import {
   uploadAttachment,
   chunk,

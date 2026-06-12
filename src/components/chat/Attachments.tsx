@@ -1,10 +1,10 @@
 "use client";
 
 import { FileText, X, Download } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import { CircularProgress } from "./CircularProgress";
-import { formatBytes, type UploadItem } from "@/lib/chat-media";
-import type { Attachment } from "@/lib/chat-bus";
+import { formatBytes, type UploadItem } from "../../lib/chat-media";
+import type { Attachment } from "../../lib/chat-bus";
 
 // Telegram-like photo grid for 2+ images: odd counts (3,5) lead with a wide
 // hero, the rest in a 2-col grid.

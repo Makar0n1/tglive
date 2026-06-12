@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "../../../../../server/config";
+import { prisma } from "../../../../../lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export async function GET() {
     orderBy: { lastMessageAt: "desc" },
     take: 100,
     include: {
-      visitor: { select: { id: true, name: true, contact: true, _count: { select: { leads: true } } } },
+      visitor: { select: { id: true, name: true, contact: true } },
       messages: { orderBy: { createdAt: "desc" }, take: 1 },
     },
   });
@@ -30,7 +30,6 @@ export async function GET() {
         lastSender: last?.sender ?? null,
         visitorName: t.visitor.name,
         visitorContact: t.visitor.contact,
-        leadsCount: t.visitor._count.leads,
       };
     }),
   });

@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Reply, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import { Bubble, type ChatMsg } from "./ChatMessage";
 import { REACTION_EMOJIS } from "./reactions";
 

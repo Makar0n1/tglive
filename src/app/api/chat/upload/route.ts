@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { getVisitorCookieId } from "@/lib/visitor";
-import { processChatUpload } from "@/lib/chat-upload";
-import { getClientIp } from "@/lib/request";
-import { rateLimit, sweep } from "@/lib/ratelimit";
+import { getVisitorCookieId } from "../../../../lib/visitor";
+import { processChatUpload } from "../../../../lib/chat-upload";
+import { getClientIp } from "../../../../lib/request";
+import { rateLimit, sweep } from "../../../../lib/ratelimit";
 
 // Guest chat attachment upload. One file per request (so the client can show
 // per-file progress). Requires an existing visitor cookie.

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { parseAttachments } from "@/lib/chat";
+import { getCurrentUser } from "../../../../../server/config";
+import { prisma } from "../../../../../lib/prisma";
+import { parseAttachments } from "../../../../../lib/chat";
 
 export const dynamic = "force-dynamic";
 
@@ -22,11 +22,7 @@ export async function GET(req: Request) {
         take: 500,
         include: { replyTo: { select: { id: true, body: true, sender: true } } },
       },
-      visitor: {
-        include: {
-          leads: { orderBy: { createdAt: "desc" } },
-        },
-      },
+      visitor: true,
     },
   });
   if (!thread) return NextResponse.json({ error: "not found" }, { status: 404 });
@@ -46,13 +42,6 @@ export async function GET(req: Request) {
       ip: thread.visitor.ip,
       createdAt: thread.visitor.createdAt.toISOString(),
     },
-    leads: thread.visitor.leads.map((l) => ({
-      id: l.id,
-      message: l.message,
-      contact: l.contact,
-      status: l.status,
-      createdAt: l.createdAt.toISOString(),
-    })),
     messages: thread.messages.map((m) => ({
       id: m.id,
       sender: m.sender,

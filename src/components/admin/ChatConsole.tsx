@@ -3,23 +3,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAdminChat } from "./AdminChatProvider";
-import { StatusBadge } from "./ui";
-import { cn, formatDate } from "@/lib/utils";
-import { AutoTextarea } from "@/components/chat/AutoTextarea";
-import { EmojiHover } from "@/components/chat/EmojiHover";
-import { ReplyBar } from "@/components/chat/ReplyBar";
-import { ChatMessage, type ChatMsg } from "@/components/chat/ChatMessage";
-import { MessageOverlay } from "@/components/chat/MessageOverlay";
-import { AttachButton } from "@/components/chat/AttachButton";
-import { ChatLightbox } from "@/components/chat/ChatLightbox";
-import { StagedStrip, type StagedFile } from "@/components/chat/StagedStrip";
-import { applyReactionToggle } from "@/components/chat/reactions";
-import { sanitizeChatBody } from "@/lib/chat-text";
-import { useChatAppShell } from "@/lib/useChatAppShell";
-import { useChatAttachmentSend } from "@/lib/useChatAttachmentSend";
-import { validateFile } from "@/lib/chat-media";
-import { ArrowLeft, X, Inbox, Send, ChevronDown } from "lucide-react";
-import type { ChatEvent, Reaction, Attachment } from "@/lib/chat-bus";
+import { cn } from "../../lib/utils";
+import { AutoTextarea } from "../chat/AutoTextarea";
+import { EmojiHover } from "../chat/EmojiHover";
+import { ReplyBar } from "../chat/ReplyBar";
+import { ChatMessage, type ChatMsg } from "../chat/ChatMessage";
+import { MessageOverlay } from "../chat/MessageOverlay";
+import { AttachButton } from "../chat/AttachButton";
+import { ChatLightbox } from "../chat/ChatLightbox";
+import { StagedStrip, type StagedFile } from "../chat/StagedStrip";
+import { applyReactionToggle } from "../chat/reactions";
+import { sanitizeChatBody } from "../../lib/chat-text";
+import { useChatAppShell } from "../../lib/useChatAppShell";
+import { useChatAttachmentSend } from "../../lib/useChatAttachmentSend";
+import { validateFile } from "../../lib/chat-media";
+import { ArrowLeft, X, Send, ChevronDown } from "lucide-react";
+import type { ChatEvent, Reaction, Attachment } from "../../lib/chat-bus";
 
 type ConvMessage = ChatMsg;
 interface VisitorInfo {
@@ -29,21 +28,12 @@ interface VisitorInfo {
   ip: string | null;
   createdAt: string;
 }
-interface LinkedLead {
-  id: string;
-  message: string;
-  contact: string;
-  status: string;
-  createdAt: string;
-}
-
 export function ChatConsole() {
   const { threads, activeId, setActiveId, markThreadRead, subscribe, unreadTotal } =
     useAdminChat();
 
   const [messages, setMessages] = useState<ConvMessage[]>([]);
   const [visitor, setVisitor] = useState<VisitorInfo | null>(null);
-  const [leads, setLeads] = useState<LinkedLead[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -84,7 +74,6 @@ export function ChatConsole() {
         (data.messages || []).forEach((m: ConvMessage) => ids.current.add(m.id));
         setMessages(data.messages || []);
         setVisitor(data.visitor || null);
-        setLeads(data.leads || []);
         setVisitorReadAt(data.thread?.visitorReadAt ?? null);
         setTheyTyping(false);
       } finally {
@@ -114,7 +103,6 @@ export function ChatConsole() {
     clearTimer.current = setTimeout(() => {
       setMessages([]);
       setVisitor(null);
-      setLeads([]);
       setVisitorReadAt(null);
     }, 320);
   }
@@ -419,11 +407,6 @@ export function ChatConsole() {
                   {t.lastSender === "ADMIN" ? "Вы: " : ""}
                   {t.lastBody}
                 </span>
-                {t.leadsCount > 0 ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] text-accent">
-                    <Inbox size={11} /> заявок: {t.leadsCount}
-                  </span>
-                ) : null}
               </button>
             ))
           )}
@@ -480,24 +463,6 @@ export function ChatConsole() {
                   <X size={14} /> Закрыть
                 </button>
               </div>
-              {leads.length > 0 ? (
-                <div className="mt-2 rounded-lg border border-accent/30 bg-accent/5 p-2">
-                  <p className="mb-1 text-xs font-medium text-accent">
-                    Заявки этого человека ({leads.length}):
-                  </p>
-                  <div className="space-y-1">
-                    {leads.map((l) => (
-                      <div key={l.id} className="flex items-center justify-between gap-2 text-xs">
-                        <span className="truncate text-fg-muted">{l.message}</span>
-                        <span className="flex shrink-0 items-center gap-1">
-                          <StatusBadge status={l.status} />
-                          <span className="text-fg-faint">{formatDate(l.createdAt)}</span>
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
             </div>
 
             {/* Messages */}

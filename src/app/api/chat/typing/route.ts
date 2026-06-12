@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getVisitorCookieId } from "@/lib/visitor";
-import { prisma } from "@/lib/prisma";
-import { notifyVisitorTyping } from "@/lib/chat";
+import { getVisitorCookieId } from "../../../../lib/visitor";
+import { prisma } from "../../../../lib/prisma";
+import { notifyVisitorTyping } from "../../../../lib/chat";
 
 // Transient "visitor is typing" signal. No-op until a thread exists.
 export async function POST() {
