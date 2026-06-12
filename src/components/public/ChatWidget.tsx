@@ -97,6 +97,14 @@ export function ChatWidget() {
   // Keyboard up? When it is, the browser's bottom chrome is gone (the keyboard
   // replaces it), so the big bottom inset must collapse to a small one.
   const [kbUp, setKbUp] = useState(false);
+  // Bottom inset for the composer depends on the browser's bottom chrome, which
+  // overlaps the content differently: Chrome iOS has a tall bottom nav bar,
+  // Safari a shorter URL bar, everything else (Firefox, Android) reports the
+  // visible height correctly and needs almost nothing.
+  const [bottomPad, setBottomPad] = useState("pb-3");
+  // Bottom inset while the keyboard is UP (browser chrome is gone, but Safari
+  // still tucks a small URL pill above the keyboard, so it needs a bit more).
+  const [kbUpPad, setKbUpPad] = useState("pb-3");
   // Firefox renders the chat fine without the sticky header — skip it there.
   const [isFirefox, setIsFirefox] = useState(false);
   const stickyHeaderRef = useRef<HTMLDivElement>(null);
@@ -251,7 +259,14 @@ export function ChatWidget() {
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 639);
     check();
-    const firefox = /fxios|firefox/i.test(navigator.userAgent);
+    const ua = navigator.userAgent;
+    const crios = /crios/i.test(ua);
+    const firefox = /fxios|firefox/i.test(ua);
+    const safari = /^((?!chrome|android|crios|fxios|edg).)*safari/i.test(ua);
+    setBottomPad(crios ? "pb-32" : safari ? "pb-12" : "pb-3");
+    // Keyboard-up inset: Safari needs a chunk (URL pill), Chrome iOS a moderate
+    // lift to clear the keyboard, everyone else almost nothing.
+    setKbUpPad(safari ? "pb-12" : crios ? "pb-[7.5rem]" : "pb-3");
     setIsFirefox(firefox);
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -327,21 +342,19 @@ export function ChatWidget() {
 
       html.style.height = h;
       body.style.height = h;
-      // ALIGN the locked document with the visible viewport. Some browsers (notably
-      // Safari in a tab) push the visible area DOWN on input focus and report it via
-      // visualViewport.offsetTop (> 0) while leaving the page pinned to layout-top —
-      // so a position:fixed html at top:0 ends up ABOVE the visible area and the
-      // whole chat "flies up under the header". Moving html down by offsetTop puts
-      // the entire panel (header + list + composer) back inside the visible area.
-      // No-op where offsetTop stays ~0 (installed PWA, Chrome/Firefox, desktop).
-      html.style.top = `${offTop}px`;
       // Pin the sticky header to the top of the visible viewport.
       if (stickyHeaderRef.current) {
         stickyHeaderRef.current.style.top = `${offTop}px`;
       }
+      // SHRINK the message list from the TOP by offsetTop. On Safari/Chrome/PWA
+      // (not Firefox) the keyboard pushes the visible viewport DOWN (offsetTop > 0)
+      // while our locked panel stays pinned to layout-top — so the list's top band
+      // sits ABOVE the visible area and its first messages are unreachable (you
+      // scroll to scrollTop:0 but the top is off-screen). The list is flex-1, so a
+      // top margin both drops it into view AND shrinks its height (the composer at
+      // the bottom is untouched) — exactly "narrow the dialog window from the top".
       if (el) {
-        // html.top already aligns the whole panel — no per-list margin needed.
-        el.style.marginTop = "";
+        el.style.marginTop = offTop ? `${offTop}px` : "";
         if (!stable) {
           // Keep the line above the input fixed: same distance from the bottom.
           el.scrollTop = el.scrollHeight - el.clientHeight - distFromBottom;
@@ -380,44 +393,6 @@ export function ChatWidget() {
       if (t && t.closest(".chat-scroll, [data-chat-lightbox]")) return;
       if (e.cancelable) e.preventDefault();
     };
-    // Safari in a browser TAB (not an installed PWA) barely fires visualViewport
-    // events during the keyboard animation, yet it DOES update offsetTop smoothly.
-    // Event-driven tracking therefore only catches the FINAL value -> the panel
-    // jumps up and snaps back. Fix: while an input is focused, poll every frame so
-    // html.top follows offsetTop continuously. Chrome/Firefox fire events fine and
-    // keep their (working) event path — the poll never starts for them.
-    const safariTab =
-      /^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent) &&
-      !(
-        (typeof window.matchMedia === "function" &&
-          window.matchMedia("(display-mode: standalone)").matches) ||
-        (window.navigator as { standalone?: boolean }).standalone === true
-      );
-    let pollRaf = 0;
-    let pollStop: ReturnType<typeof setTimeout> | undefined;
-    const poll = () => {
-      setH();
-      pollRaf = requestAnimationFrame(poll);
-    };
-    const onFocusIn = () => {
-      captureDist();
-      if (safariTab) {
-        clearTimeout(pollStop);
-        if (!pollRaf) pollRaf = requestAnimationFrame(poll);
-      }
-    };
-    const onFocusOut = () => {
-      captureDist();
-      if (safariTab) {
-        // Keep polling through the close animation, then stop.
-        clearTimeout(pollStop);
-        pollStop = setTimeout(() => {
-          if (pollRaf) cancelAnimationFrame(pollRaf);
-          pollRaf = 0;
-        }, 700);
-      }
-    };
-
     setH();
     captureDist();
     vv?.addEventListener("resize", onVV);
@@ -425,9 +400,10 @@ export function ChatWidget() {
     window.addEventListener("resize", onVV);
     document.addEventListener("touchmove", onTouchMove, { passive: false });
     // focusin/focusout = the reliable keyboard open/close triggers: snapshot the
-    // line above the input + (Safari tab) start/stop the per-frame poll.
-    document.addEventListener("focusin", onFocusIn);
-    document.addEventListener("focusout", onFocusOut);
+    // line above the input right before the viewport starts moving. The scroll
+    // listener keeps that snapshot current while the user reads.
+    document.addEventListener("focusin", captureDist);
+    document.addEventListener("focusout", captureDist);
     scrollRef.current?.addEventListener("scroll", onListScroll, { passive: true });
     const listEl = scrollRef.current;
     return () => {
@@ -436,11 +412,9 @@ export function ChatWidget() {
       vv?.removeEventListener("scroll", onVV);
       window.removeEventListener("resize", onVV);
       document.removeEventListener("touchmove", onTouchMove);
-      document.removeEventListener("focusin", onFocusIn);
-      document.removeEventListener("focusout", onFocusOut);
+      document.removeEventListener("focusin", captureDist);
+      document.removeEventListener("focusout", captureDist);
       listEl?.removeEventListener("scroll", onListScroll);
-      clearTimeout(pollStop);
-      if (pollRaf) cancelAnimationFrame(pollRaf);
       const restore = (el: HTMLElement, p: ReturnType<typeof save>) => {
         el.style.position = p.position;
         el.style.top = p.top;
@@ -971,14 +945,7 @@ export function ChatWidget() {
           ) : null}
           </div>
 
-          {/* Device-agnostic bottom inset: clears the home-indicator / safe area on
-              notched phones, collapses to a small pad elsewhere (and when the
-              keyboard is up, where the safe area reads 0). Replaces the old
-              per-browser hardcoded paddings that only fit one specific device. */}
-          <div
-            className="border-t border-bg-border px-2.5 pt-2"
-            style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
-          >
+          <div className={cn("border-t border-bg-border px-2.5 pt-2 sm:pb-3", kbUp ? kbUpPad : bottomPad)}>
             {mediaError ? (
               <p className="mb-2 rounded-md bg-red-500/15 px-2 py-1 text-xs text-red-300">{mediaError}</p>
             ) : null}

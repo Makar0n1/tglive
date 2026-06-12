@@ -22,16 +22,28 @@ export function useChatAppShell(
   pageHideId?: string
 ) {
   const [isMobile, setIsMobile] = useState(false);
+  const [bottomPad, setBottomPad] = useState("pb-3");
+  const [kbUpPad, setKbUpPad] = useState("pb-3");
   const [isFirefox, setIsFirefox] = useState(false);
   const [kbUp, setKbUp] = useState(false);
   const [stickyShow, setStickyShow] = useState(false);
 
-  // Mobile breakpoint + Firefox detection (the composer bottom inset is now
-  // device-agnostic via env(safe-area-inset-bottom) in ChatConsole, not per-UA).
+  // Mobile breakpoint + per-browser inset classes.
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= maxWidth);
     check();
-    setIsFirefox(/fxios|firefox/i.test(navigator.userAgent));
+    const ua = navigator.userAgent;
+    const crios = /crios/i.test(ua);
+    const firefox = /fxios|firefox/i.test(ua);
+    const safari = /^((?!chrome|android|crios|fxios|edg).)*safari/i.test(ua);
+    const standalone =
+      (typeof window.matchMedia === "function" &&
+        window.matchMedia("(display-mode: standalone)").matches) ||
+      (window.navigator as { standalone?: boolean }).standalone === true;
+    setBottomPad(crios ? "pb-[120px]" : safari ? "pb-[46px]" : "pb-3");
+    // Installed PWA has no browser chrome above the keyboard -> much smaller inset.
+    setKbUpPad(standalone ? "pb-[20px]" : safari ? "pb-[62px]" : crios ? "pb-[118px]" : "pb-3");
+    setIsFirefox(firefox);
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, [maxWidth]);
@@ -97,16 +109,16 @@ export function useChatAppShell(
       // extra (pane top/height tracking) made Safari fly the composer.
       html.style.height = h;
       body.style.height = h;
-      // ALIGN the locked document with the visible viewport (Safari tab pushes it
-      // down via offsetTop while leaving the page at layout-top → chat flies up).
-      // Moving html down by offsetTop restores the whole panel. No-op when ~0.
-      html.style.top = offTop;
       if (stickyHeaderRef.current) {
         stickyHeaderRef.current.style.top = offTop;
       }
+      // SHRINK the message list from the TOP by offsetTop. On Safari/Chrome/PWA
+      // (not Firefox) the keyboard pushes the visible viewport DOWN while the
+      // locked pane stays pinned to layout-top, so the list's top band is off
+      // screen and the first messages are unreachable. The list is flex-1, so a
+      // top margin drops it into view AND shrinks its height (composer untouched).
       if (list) {
-        // html.top already aligns the whole panel — no per-list margin needed.
-        list.style.marginTop = "";
+        list.style.marginTop = offTopPx ? `${offTopPx}px` : "";
         if (!stable) {
           // Keep the line above the input fixed: same distance from the bottom.
           list.scrollTop = list.scrollHeight - list.clientHeight - distFromBottom;
@@ -206,5 +218,5 @@ export function useChatAppShell(
     };
   }, [active, isMobile, paneRef]);
 
-  return { isMobile, kbUp, stickyShow, isFirefox };
+  return { isMobile, bottomPad, kbUpPad, kbUp, stickyShow, isFirefox };
 }
