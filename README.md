@@ -1,4 +1,4 @@
-# telegrade
+# tglive
 
 **Telegram-grade live chat for Next.js.** A floating widget for visitors, an
 admin console for you, realtime over SSE — and the part nobody else nails:
@@ -6,8 +6,8 @@ admin console for you, realtime over SSE — and the part nobody else nails:
 Firefox and installed PWAs. No third-party service, your data, your database.
 
 ```bash
-npm i telegrade
-npx telegrade init
+npm i tglive
+npx tglive init
 ```
 
 ---
@@ -34,15 +34,15 @@ npx telegrade init
 
 ## Setup
 
-`npx telegrade init` writes the thin route files for you. Then six one-time steps:
+`npx tglive init` writes the thin route files for you. Then six one-time steps:
 
 ### 1. Database
 
-Append the models from `node_modules/telegrade/prisma/chat.prisma` to your
+Append the models from `node_modules/tglive/prisma/chat.prisma` to your
 `prisma/schema.prisma`:
 
 ```bash
-npx prisma migrate dev --name telegrade
+npx prisma migrate dev --name tglive
 npx prisma generate
 ```
 
@@ -51,7 +51,7 @@ npx prisma generate
 ```js
 // tailwind.config.js
 module.exports = {
-  presets: [require("telegrade/tailwind")], // colors + animations + the package's content glob
+  presets: [require("tglive/tailwind")], // colors + animations + the package's content glob
   content: ["./src/**/*.{ts,tsx}"],          // your own content
 };
 ```
@@ -63,13 +63,13 @@ Rebrand by overriding the `bg-*/fg-*/accent` colors in your own config.
 Import once (e.g. in your root layout):
 
 ```ts
-import "telegrade/styles.css";
+import "tglive/styles.css";
 ```
 
 ### 4. next.config
 
 ```js
-const nextConfig = { transpilePackages: ["telegrade"] };
+const nextConfig = { transpilePackages: ["tglive"] };
 ```
 
 ### 5. Wire your auth
@@ -77,7 +77,7 @@ const nextConfig = { transpilePackages: ["telegrade"] };
 ```ts
 // instrumentation.ts  (runs once at server startup)
 export async function register() {
-  const { configureChat } = await import("telegrade/server");
+  const { configureChat } = await import("tglive/server");
   const { getCurrentUser } = await import("@/lib/auth"); // your existing auth
   configureChat({ getCurrentUser }); // return your admin (any truthy) or null
 }
@@ -101,7 +101,7 @@ export const viewport: Viewport = {
 
 ```tsx
 // public layout — wrap your page in #pf-page, render the widget as a SIBLING
-import { ChatWidget } from "telegrade";
+import { ChatWidget } from "tglive";
 
 export default function PublicLayout({ children }) {
   return (
@@ -115,7 +115,7 @@ export default function PublicLayout({ children }) {
 
 ```tsx
 // admin layout — protect this route with YOUR auth; root needs id="admin-shell"
-import { AdminChatProvider } from "telegrade/admin";
+import { AdminChatProvider } from "tglive/admin";
 
 export default function AdminLayout({ children }) {
   return (
@@ -128,7 +128,7 @@ export default function AdminLayout({ children }) {
 
 ```tsx
 // app/admin/chat/page.tsx
-import { ChatConsole } from "telegrade/admin";
+import { ChatConsole } from "tglive/admin";
 export default function Page() {
   return <ChatConsole />;
 }
@@ -138,7 +138,7 @@ Optional unread badge anywhere in your admin nav:
 
 ```tsx
 "use client";
-import { useAdminChat } from "telegrade/admin";
+import { useAdminChat } from "tglive/admin";
 export function Badge() {
   const { unreadTotal } = useAdminChat();
   return unreadTotal ? <span>{unreadTotal}</span> : null;
@@ -162,7 +162,7 @@ Open a public page on your phone, send a message, answer from `/admin/chat`. ✅
 
 ## Versioning & updates
 
-Semantic versioning. `npm update telegrade` (or Dependabot/Renovate) pulls new
+Semantic versioning. `npm update tglive` (or Dependabot/Renovate) pulls new
 component/logic versions; the generated route files, your Prisma models and config
 stay yours and rarely change. Breaking changes only ever land in a major version.
 

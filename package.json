@@ -1,5 +1,5 @@
 {
-  "name": "telegrade",
+  "name": "tglive",
   "version": "0.1.0",
   "description": "Telegram-grade live chat for Next.js — visitor widget + admin console, realtime over SSE, attachments, reactions, and best-in-class mobile-keyboard behavior.",
   "keywords": [
@@ -18,18 +18,18 @@
   "author": "makar0n1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/makar0n1/telegrade.git"
+    "url": "git+https://github.com/makar0n1/tglive.git"
   },
-  "homepage": "https://github.com/makar0n1/telegrade#readme",
+  "homepage": "https://github.com/makar0n1/tglive#readme",
   "bugs": {
-    "url": "https://github.com/makar0n1/telegrade/issues"
+    "url": "https://github.com/makar0n1/tglive/issues"
   },
   "type": "module",
   "sideEffects": [
     "*.css"
   ],
   "bin": {
-    "telegrade": "./bin/telegrade.mjs"
+    "tglive": "./bin/tglive.mjs"
   },
   "files": [
     "bin",

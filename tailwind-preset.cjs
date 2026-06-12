@@ -2,7 +2,7 @@
  * Telegrade Tailwind preset. Add it to your tailwind.config:
  *
  *   module.exports = {
- *     presets: [require("telegrade/tailwind")],
+ *     presets: [require("tglive/tailwind")],
  *     content: ["./src/**\/*.{ts,tsx}"], // your own content stays
  *   };
  *
@@ -11,7 +11,7 @@
  * a `content` glob so Tailwind keeps the chat's classes (it lives in node_modules).
  */
 module.exports = {
-  content: ["./node_modules/telegrade/src/**/*.{ts,tsx}"],
+  content: ["./node_modules/tglive/src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
